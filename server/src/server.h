@@ -1,0 +1,1 @@
+#define ErrSocket "failed to create server socket"

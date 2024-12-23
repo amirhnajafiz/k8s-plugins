@@ -1,12 +1,17 @@
 #include <cstdlib>
+#include <iostream>
 #include <netinet/in.h> // sockaddr
 #include <sys/socket.h> // socket
+#include "server.h"
+
+using namespace std;
 
 int main()
 {
     // creating server socket
     int s_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (s_socket == -1) {
+        cerr << "" << endl;
         return EXIT_FAILURE;
     }
 
