@@ -1,10 +1,35 @@
-#include <sys/socket.h>
+#include <cstdlib>
+#include <netinet/in.h> // sockaddr
+#include <sys/socket.h> // socket
 
 int main()
 {
     // creating server socket
     int s_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (s_socket == -1) {
-        return 1;
+        return EXIT_FAILURE;
+    }
+
+    // setting the socket address
+    sockaddr_in server_addr;
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(8080);
+
+    // binding the socket
+    if (bind(s_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
+        return EXIT_FAILURE;
+    }
+
+    // listening to the bounded socket
+    if (listen(s_socket, 10) == -1) {
+        return EXIT_FAILURE;
+    }
+
+    // server while loop for accepting clients
+    while(true)
+    {
+        // accept client
+        int c_socket = accept(s_socket, 0, 0);
     }
 }
