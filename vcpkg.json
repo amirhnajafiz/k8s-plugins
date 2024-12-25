@@ -1,0 +1,11 @@
+{
+    "name": "cssh",
+    "version": "0.0.0",
+    "dependencies": [
+      {
+        "name": "yaml-cpp",
+        "version>=": "0.7.0"
+      }
+    ]
+  }
+  

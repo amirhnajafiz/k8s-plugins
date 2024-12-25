@@ -1,3 +1,4 @@
+#include <yaml-cpp/yaml.h>
 #include "../include/errors.h"
 #include "../include/server.h"
 
@@ -5,6 +6,9 @@ using namespace std;
 
 int main()
 {
+    // read config file
+    YAML
+
     // creating server socket
     int s_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (s_socket == -1) {
