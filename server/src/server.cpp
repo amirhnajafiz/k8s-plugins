@@ -1,3 +1,4 @@
+#include <arpa/inet.h> // inet
 #include <cstdlib> // errors
 #include <cstring> // strlen
 #include <iostream> // cout
@@ -36,11 +37,20 @@ int main()
     // server while loop for accepting clients
     while(true)
     {
+        // variables for client connection info
+        struct sockaddr_in c_addr;
+        socklen_t c_add_size = sizeof(c_addr);
+
         // accept client
-        int c_socket = accept(s_socket, 0, 0);
+        int c_socket = accept(s_socket, (struct sockaddr*)&c_addr, &c_add_size);
+
+        // append a log entry in server (client ip)
+        char ip[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &c_addr.sin_addr, ip, INET_ADDRSTRLEN);
+        cout << "conn: " << ip << endl;
 
         // send a message to client
-        const char* message = "bazinga!";
+        const char* message = "bazinga!\n";
         if (send(c_socket, message, strlen(message), 0) == -1) {
             cout << ErrSend << endl;
         }
