@@ -1,4 +1,3 @@
-#include <yaml-cpp/yaml.h>
 #include "../include/errors.h"
 #include "../include/server.h"
 
@@ -6,8 +5,8 @@ using namespace std;
 
 int main()
 {
-    // read config file
-    YAML
+    // load config file
+    YAML::Node config = YAML::LoadFile("config.yaml");
 
     // creating server socket
     int s_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -20,7 +19,7 @@ int main()
     sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = INADDR_ANY;
-    server_addr.sin_port = htons(8080);
+    server_addr.sin_port = htons(config["port"].as<int>());
 
     // binding the socket
     if (bind(s_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
