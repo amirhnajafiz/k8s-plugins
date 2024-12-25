@@ -1,4 +1,5 @@
-#include "server.h"
+#include "../include/errors.h"
+#include "../include/server.h"
 
 using namespace std;
 
@@ -7,7 +8,7 @@ int main()
     // creating server socket
     int s_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (s_socket == -1) {
-        cerr << ErrSocket << endl;
+        cerr << ERR_SOCKET << endl;
         return EXIT_FAILURE;
     }
 
@@ -37,7 +38,7 @@ int main()
         // accept client
         int c_socket = accept(s_socket, (struct sockaddr*)&c_addr, &c_add_size);
         if (c_socket == -1) {
-            cout << ErrConn << endl;
+            cout << ERR_CONN << endl;
         }
 
         // extract client's IP
@@ -50,7 +51,7 @@ int main()
         // send a message to client
         const char* message = "bazinga!\n";
         if (send(c_socket, message, strlen(message), 0) == -1) {
-            cout << ErrSend << endl;
+            cout << ERR_TRANSMIT << endl;
         }
 
         // close client connection
