@@ -1,7 +1,9 @@
-#include <cstdlib>
-#include <iostream>
+#include <cstdlib> // errors
+#include <cstring> // strlen
+#include <iostream> // cout
 #include <netinet/in.h> // sockaddr
 #include <sys/socket.h> // socket
+#include <unistd.h> // close
 #include "server.h"
 
 using namespace std;
@@ -11,7 +13,7 @@ int main()
     // creating server socket
     int s_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (s_socket == -1) {
-        cerr << "" << endl;
+        cerr << ErrSocket << endl;
         return EXIT_FAILURE;
     }
 
@@ -36,5 +38,14 @@ int main()
     {
         // accept client
         int c_socket = accept(s_socket, 0, 0);
+
+        // send a message to client
+        const char* message = "bazinga!";
+        if (send(c_socket, message, strlen(message), 0) == -1) {
+            cout << ErrSend << endl;
+        }
+
+        // close client connection
+        close(c_socket);
     }
 }
