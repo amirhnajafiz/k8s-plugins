@@ -1,3 +1,4 @@
+#include "../include/config.h"
 #include "../include/errors.h"
 #include "../include/server.h"
 
@@ -6,7 +7,7 @@ using namespace std;
 int main()
 {
     // load config file
-    YAML::Node config = YAML::LoadFile("config.yaml");
+    YAML::Node config = YAML::LoadFile(CFG_PATH);
 
     // creating server socket
     int s_socket = socket(AF_INET, SOCK_STREAM, 0);
