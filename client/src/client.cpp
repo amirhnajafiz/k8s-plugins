@@ -18,45 +18,57 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // extract the user, host, and port
+    // extract user, host and port
     string user = userHostPort.substr(0, atPos);
     string host = userHostPort.substr(atPos + 1, colonPos - atPos - 1);
-    string portStr = userHostPort.substr(colonPos + 1);
-    
-    int port;
-    istringstream(portStr) >> port;
+    std::stringstream portStream(userHostPort.substr(colonPos + 1));
 
-    // create a socket
+    int port;
+    portStream >> port;
+
+    // create socket
     int sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock == -1) {
-        cerr << "failed to create socket" << endl;
+    if (sock < 0) {
+        cerr << "socket creation error" << endl;
         return 1;
     }
 
-    // prepare the server address
-    struct sockaddr_in server;
-    server.sin_family = AF_INET;
-    server.sin_port = htons(port);
-    if (inet_pton(AF_INET, host.c_str(), &server.sin_addr) <= 0) {
-        cerr << "invalid address" << endl;
+    // setup server address
+    struct sockaddr_in server_addr;
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(port);
+
+    // convert host to binary form
+    if (inet_pton(AF_INET, host.c_str(), &server_addr.sin_addr) <= 0) {
+        cerr << "invalid address/ address not supported" << endl;
         return 1;
     }
 
     // connect to the server
-    if (connect(sock, (struct sockaddr *)&server, sizeof(server)) < 0) {
+    if (connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
         cerr << "connection failed" << endl;
         return 1;
     }
 
-    // get server response
+    // read commands from console and send to server
+    string command;
     char buffer[1024] = {0};
-    int valread;
+    while (true) {
+        cout << "/" << user << "$ ";
+        getline(cin, command);
 
-    // read the response from the server
-    while ((valread = read(sock, buffer, 1024)) > 0) {
-        cout << buffer;
-        memset(buffer, 0, 1024);
+        // send command to server
+        send(sock, command.c_str(), command.length(), 0);
+
+        // receive response from server
+        int valread = read(sock, buffer, 1024);
+        cout << string(buffer, valread) << endl;
+
+        // clear buffer
+        memset(buffer, 0, sizeof(buffer));
     }
 
+    // close the socket
+    close(sock);
     return 0;
 }
