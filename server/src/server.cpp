@@ -27,7 +27,7 @@ int main()
     }
 
     // listening to the bounded socket
-    if (listen(s_socket, 10) == -1) {
+    if (listen(s_socket, config["queue_size"].as<int>()) == -1) {
         return EXIT_FAILURE;
     }
 
@@ -49,7 +49,7 @@ int main()
         inet_ntop(AF_INET, &c_addr.sin_addr, c_ip, INET_ADDRSTRLEN);
 
         // append a log entry in server (client ip)
-        cout << "conn: " << c_ip << endl;
+        cout << "in-conn: " << c_ip << endl;
 
         // send a message to client
         const char* message = "bazinga!\n";
