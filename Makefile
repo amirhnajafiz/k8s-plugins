@@ -6,8 +6,8 @@ INCLUDE = -I./vcpkg_installed/x64-linux/include
 SRC_DIR = server/src
 BUILD_DIR = build
 
-SERVER_SRC = $(SRC_DIR)/server.cpp $(SRC_DIR)/config.cpp
-SERVER_OBJ = $(BUILD_DIR)/server.o $(BUILD_DIR)/config.o
+SERVER_SRC = $(SRC_DIR)/server.cpp $(SRC_DIR)/config.cpp $(SRC_DIR)/handler.cpp
+SERVER_OBJ = $(BUILD_DIR)/server.o $(BUILD_DIR)/config.o $(BUILD_DIR)/handler.o
 
 .PHONY: all clean
 

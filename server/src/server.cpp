@@ -1,5 +1,6 @@
 #include "../include/config.h"
 #include "../include/errors.h"
+#include "../include/handler.h"
 #include "../include/server.h"
 
 using namespace std;
@@ -52,11 +53,8 @@ int main()
         // append a log entry in server (client ip)
         cout << "in-conn: " << c_ip << endl;
 
-        // send a message to client
-        const char* message = "bazinga!\n";
-        if (send(c_socket, message, strlen(message), 0) == -1) {
-            cout << ERR_TRANSMIT << endl;
-        }
+        // run the handler function
+        handle(c_socket);
 
         // close client connection
         close(c_socket);
