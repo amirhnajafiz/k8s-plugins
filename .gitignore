@@ -50,3 +50,4 @@ vcpkg_installed/
 
 # Ignore test output
 tests/*.log
+config.yaml
