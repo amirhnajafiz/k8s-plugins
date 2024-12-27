@@ -24,6 +24,7 @@ build/
 bin/
 obj/
 out/
+vcpkg_installed/
 
 # Ignore IDE/Editor-specific files
 # For Visual Studio
