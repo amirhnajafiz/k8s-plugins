@@ -6,8 +6,8 @@ using namespace std;
 
 int main()
 {
-    // load config file
-    YAML::Node config = YAML::LoadFile(CFG_PATH);
+    // read the server configuration
+    struct server_config config = read_config("config.yaml");
 
     // creating server socket
     int s_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -20,7 +20,7 @@ int main()
     sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = INADDR_ANY;
-    server_addr.sin_port = htons(config["port"].as<int>());
+    server_addr.sin_port = htons(config.port);
 
     // binding the socket
     if (bind(s_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
@@ -28,7 +28,7 @@ int main()
     }
 
     // listening to the bounded socket
-    if (listen(s_socket, config["queue_size"].as<int>()) == -1) {
+    if (listen(s_socket, config.queue_size) == -1) {
         return EXIT_FAILURE;
     }
 
