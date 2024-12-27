@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic
-LDFLAGS = -L/home/amirhnajafiz/vcpkg/installed/x64-linux/lib -lyaml-cpp
-INCLUDE = -I/home/amirhnajafiz/vcpkg/installed/x64-linux/include
+LDFLAGS = -L./vcpkg_installed/x64-linux/lib -lyaml-cpp
+INCLUDE = -I./vcpkg_installed/x64-linux/include
 
 SRC_DIR = server/src
 BUILD_DIR = build
