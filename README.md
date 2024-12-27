@@ -17,8 +17,8 @@ Command `cssh user@ip:port -p password -f public-key`.
 
 ## TODO
 
-- [ ] Add client handler in server side
-- [ ] Run `ls` command for each connection and return the response
+- [X] Add client handler in server side
+- [X] Run `ls` command for each connection and return the response
 - [ ] Create a client that accepts input messages and sends them to server
 - [ ] Make the command execution dynamic in server
 - [ ] Secure messages using AES and a password in server config
