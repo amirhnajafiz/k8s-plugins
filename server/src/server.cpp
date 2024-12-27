@@ -33,6 +33,9 @@ int main()
         return EXIT_FAILURE;
     }
 
+    // print server info
+    cout << "server is running on port " << config.port << endl;
+
     // server while loop for accepting clients
     while(true)
     {
