@@ -1,12 +1,12 @@
 {
-    "name": "cssh",
-    "version": "0.0.0",
-    "builtin-baseline": "68d349964cb4e8da561fd849d9491e6ba11c5681",
-    "dependencies": [
-      {
-        "name": "yaml-cpp",
-        "version>=": "0.7.0"
-      }
-    ]
-  }
+  "name": "cssh",
+  "version": "0.0.0",
+  "builtin-baseline": "68d349964cb4e8da561fd849d9491e6ba11c5681",
+  "dependencies": [
+    {
+      "name": "yaml-cpp",
+      "version>=": "0.7.0"
+    }
+  ]
+}
   
