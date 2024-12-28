@@ -7,6 +7,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cerrno>
+#include <sys/select.h>
+
+using namespace std;
 
 #define BUFFER_SIZE 1024
 
@@ -53,11 +56,47 @@ void handle(int client_socket) {
         fprintf(shell, "%s\n", buffer);
         fflush(shell);
 
-        // Read the command output from the pipe
-        while ((nbytes = read(fileno(shell_read), buffer, sizeof(buffer) - 1)) > 0) {
-            buffer[nbytes] = '\0'; // Null-terminate the buffer
-            send(client_socket, buffer, nbytes, 0); // Send the output back to the client
+        cout << "Command executed" << endl;
+
+        // Set up the file descriptor set
+        fd_set read_fds;
+        FD_ZERO(&read_fds);
+        FD_SET(fileno(shell_read), &read_fds);
+
+        struct timeval timeout;
+        timeout.tv_sec = 10; // Increase timeout to 10 seconds
+        timeout.tv_usec = 0;
+
+        cout << "Waiting for command output..." << endl;
+
+        int retval = select(fileno(shell_read) + 1, &read_fds, NULL, NULL, &timeout);
+
+        if (retval == -1) {
+            std::cerr << "Error in select: " << strerror(errno) << std::endl;
+        } else if (retval == 0) {
+            std::cerr << "Timeout occurred! No data available." << std::endl;
+        } else {
+            cout << "Data available, reading from pipe..." << endl;
+            // Read the command output from the pipe
+            while ((nbytes = read(fileno(shell_read), buffer, sizeof(buffer) - 1)) > 0) {
+                buffer[nbytes] = '\0'; // Null-terminate the buffer
+                ssize_t obytes = send(client_socket, buffer, nbytes, 0); // Send the output back to the client
+                if (obytes < 0) {
+                    std::cerr << "Error sending command output: " << strerror(errno) << std::endl;
+                    break;
+                } else if (obytes == 0) {
+                    std::cerr << "Connection closed by client" << std::endl;
+                    break;
+                }
+                cout << "Command output: " << buffer << endl;
+            }
+
+            if (nbytes < 0) {
+                std::cerr << "Error reading from pipe: " << strerror(errno) << std::endl;
+            }
         }
+
+        cout << "Command output sent" << endl;
     }
 
     // Close the pipes
