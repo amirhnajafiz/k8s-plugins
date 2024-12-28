@@ -1,4 +1,8 @@
 #include "../include/client.h"
+#include <iostream>
+#include <cstring>
+#include <sys/socket.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -61,8 +65,19 @@ int main(int argc, char *argv[]) {
         send(sock, command.c_str(), command.length(), 0);
 
         // receive response from server
-        int valread = read(sock, buffer, 1024);
-        cout << string(buffer, valread) << endl;
+        int valread;
+        while (true) {
+            valread = read(sock, buffer, sizeof(buffer) - 1);
+            if (valread <= 0) {
+                break; // Exit loop if no more data or error occurs
+            }
+            buffer[valread] = '\0'; // Null-terminate the buffer
+            cout << buffer;
+            if (valread < sizeof(buffer) - 1) {
+                break; // Exit loop if the buffer is not full
+            }
+        }
+        cout << endl;
 
         // clear buffer
         memset(buffer, 0, sizeof(buffer));

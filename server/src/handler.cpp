@@ -1,66 +1,67 @@
 #include "../include/handler.h"
-#include <unistd.h>
-#include <sys/wait.h>
-#include <cstring>
 #include <iostream>
+#include <unistd.h>
+#include <fcntl.h>
+#include <cstring>
+#include <sys/socket.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cerrno>
 
-// handle function to execute user commands
+#define BUFFER_SIZE 1024
+
 void handle(int client_socket) {
-    char buffer[1024];
-    while (true) {
-        // read command from socket
-        ssize_t bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
-        if (bytes_read <= 0) {
-            perror("read");
-            break;
-        }
-        buffer[bytes_read] = '\0';
+    char buffer[BUFFER_SIZE];
+    FILE *shell;
+    FILE *shell_read;
 
-        // check for exit command
+    // Open a pipe to /bin/sh in write mode
+    shell = popen("/bin/sh", "w");
+    if (shell == NULL) {
+        std::cerr << "popen() failed: " << strerror(errno) << std::endl;
+        close(client_socket);
+        return;
+    }
+
+    // Open a pipe to /bin/sh in read mode
+    shell_read = popen("/bin/sh", "r");
+    if (shell_read == NULL) {
+        std::cerr << "popen() failed: " << strerror(errno) << std::endl;
+        pclose(shell);
+        close(client_socket);
+        return;
+    }
+
+    // Set the read end of the pipe to non-blocking
+    fcntl(fileno(shell_read), F_SETFL, O_NONBLOCK);
+
+    while (true) {
+        // Read command from the client socket
+        ssize_t nbytes = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
+        if (nbytes <= 0) {
+            std::cerr << "Client disconnected or error occurred" << std::endl;
+            break; // Exit loop if client disconnects or error occurs
+        }
+        buffer[nbytes] = '\0'; // Null-terminate the buffer
+        std::cout << "Received command: " << buffer << std::endl;
+
         if (strcmp(buffer, "exit") == 0) {
             break;
         }
 
-        // create a pipe
-        int pipefd[2];
-        if (pipe(pipefd) == -1) {
-            perror("pipe");
-            return;
-        }
+        // Write the command to the shell
+        fprintf(shell, "%s\n", buffer);
+        fflush(shell);
 
-        // fork a child process
-        pid_t pid = fork();
-        if (pid == -1) {
-            perror("fork");
-            return;
-        }
-
-        if (pid == 0) {
-            // child process
-            close(pipefd[0]); // close read end of pipe
-            dup2(pipefd[1], STDOUT_FILENO); // redirect stdout to pipe
-            dup2(pipefd[1], STDERR_FILENO); // redirect stderr to pipe
-            close(pipefd[1]);
-
-            // execute command
-            execl("/bin/sh", "sh", "-c", buffer, (char *)NULL);
-            perror("execl");
-            exit(EXIT_FAILURE);
-        } else {
-            // parent process
-            close(pipefd[1]); // close write end of pipe
-
-            // read command output from pipe
-            ssize_t nbytes;
-            while ((nbytes = read(pipefd[0], buffer, sizeof(buffer) - 1)) > 0) {
-                buffer[nbytes] = '\0';
-                write(client_socket, buffer, nbytes);
-            }
-            close(pipefd[0]);
-
-            // wait for child process to finish
-            waitpid(pid, NULL, 0);
+        // Read the command output from the pipe
+        while ((nbytes = read(fileno(shell_read), buffer, sizeof(buffer) - 1)) > 0) {
+            buffer[nbytes] = '\0'; // Null-terminate the buffer
+            send(client_socket, buffer, nbytes, 0); // Send the output back to the client
         }
     }
+
+    // Close the pipes
+    pclose(shell);
+    pclose(shell_read);
     close(client_socket);
 }
