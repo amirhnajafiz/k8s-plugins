@@ -9,3 +9,9 @@ variable "kube_config_path" {
   type        = string
   default     = "~/.kube/config"
 }
+
+variable "namespace" {
+  description = "Namespace for components"
+  type        = string
+  default     = "default"
+}
