@@ -39,5 +39,3 @@ terraform destroy -auto-approve
 - Cilium: Kubernetes Container Network Interface
 - Kube Prometheus: Monitoring stack, including Prometheus, Grafan, and Alert Manager
 - Node Feature Discovery: Exporting node metrics
-- Nvidia Device Plugin: Using NVIDIA toolkit systemcalls
-- DCGM Exporter: Exporting GPU metrics
